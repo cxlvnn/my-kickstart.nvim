@@ -145,6 +145,9 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+-- mason's bin folder to $PATH
+vim.env.PATH = vim.fn.stdpath 'data' .. '/mason/bin' .. ':' .. vim.env.PATH
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -155,6 +158,8 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
     error('Error cloning lazy.nvim:\n' .. out)
   end
 end
+
+-- kitty's padding problem
 
 ---@type vim.Option
 local rtp = vim.opt.rtp
@@ -225,6 +230,9 @@ require('lazy').setup({
     lazy = false,
     priority = 1000, -- make sure to load this before all the other start plugins
   },
+
+  -- the nightfly colorscheme
+  { 'bluz71/vim-nightfly-colors', name = 'nightfly', lazy = false, priority = 1000 },
 
   -- the kanagawa colorscheme
   {
@@ -698,7 +706,19 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
-        ts_ls = {},
+
+        ts_ls = {
+          filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
+          init_options = {
+            plugins = {
+              {
+                name = '@vue/typescript-plugin',
+                location = vim.fn.stdpath 'data' .. '/mason/packages/vue-language-server/node_modules/@vue/language-server',
+                languages = { 'vue' },
+              },
+            },
+          },
+        },
         --
 
         lua_ls = {
@@ -732,6 +752,7 @@ require('lazy').setup({
       -- for you, so that they are available from within Neovim.
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
+        'vue-language-server',
         'stylua', -- Used to format Lua code
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -750,6 +771,8 @@ require('lazy').setup({
           end,
         },
       }
+
+      local mason_bin = vim.fn.stdpath 'data' .. '/mason/bin'
     end,
   },
 

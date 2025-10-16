@@ -19,12 +19,13 @@ vim.g.have_nerd_font = true
 vim.o.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
+vim.o.scroll = 5
 
 -- Make line numbers default
 vim.o.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.o.relativenumber = true
+vim.o.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = 'a'
@@ -126,10 +127,11 @@ vim.keymap.set('n', '<Tab>', ':tabnext<CR>', { desc = 'go to next tab' })
 vim.keymap.set('n', '<S-Tab>', ':tabprevious<CR>', { desc = ' go to the previous tab using shift + tab' })
 
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
--- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
--- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
--- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
--- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
+vim.keymap.set('n', '<C-S-h>', '<C-w>H', { desc = 'Move window to the left' })
+vim.keymap.set('n', '<C-S-l>', '<C-w>L', { desc = 'Move window to the right' })
+
+-- My own keybinds
+vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, { desc = '[R]e[n]ame' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -158,8 +160,6 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
     error('Error cloning lazy.nvim:\n' .. out)
   end
 end
-
--- kitty's padding problem
 
 ---@type vim.Option
 local rtp = vim.opt.rtp
@@ -223,23 +223,33 @@ require('lazy').setup({
     end,
   },
 
+  -- sidebar file explorer neotree
+  {
+    'nvim-tree/nvim-tree.lua',
+    dependencies = 'nvim-tree/nvim-web-devicons',
+    keys = { { '<C-n>', '<cmd>NvimTreeToggle<CR>', desc = 'File tree' } },
+    opts = {
+      view = { width = 35, side = 'left' },
+      renderer = { indent_markers = { enable = true } },
+      update_focused_file = { enable = true },
+    },
+  },
+
   -- the everforest colorscheme from github
   {
     'neanias/everforest-nvim',
     version = false,
     lazy = false,
-    priority = 1000, -- make sure to load this before all the other start plugins
   },
 
   -- the nightfly colorscheme
-  { 'bluz71/vim-nightfly-colors', name = 'nightfly', lazy = false, priority = 1000 },
+  { 'bluz71/vim-nightfly-colors', name = 'nightfly', lazy = false },
 
   -- the kanagawa colorscheme
   {
     'rebelot/kanagawa.nvim',
     version = false,
     lazy = false,
-    priority = 1000,
   },
 
   -- the nightfox colorscheme
@@ -248,16 +258,17 @@ require('lazy').setup({
   },
 
   -- the catpuccin colorscheme
-  { 'catppuccin/nvim', name = 'catppuccin', priority = 1000 },
+  { 'catppuccin/nvim', name = 'catppuccin' },
 
   -- the onedark colorscheme
   {
     'olimorris/onedarkpro.nvim',
-    priority = 1000, -- Ensure it loads first
   },
 
   -- the oceanic-next colorscheme
-  { 'mhartington/oceanic-next' },
+  {
+    'mhartington/oceanic-next',
+  },
 
   -- the material colorscheme
   { 'marko-cerovac/material.nvim' },
@@ -267,7 +278,6 @@ require('lazy').setup({
     'shaunsingh/nord.nvim',
     version = false,
     lazy = false,
-    priority = 1000,
   },
 
   -- the bamboo colorscheme
@@ -275,8 +285,26 @@ require('lazy').setup({
     'ribru17/bamboo.nvim',
     version = false,
     lazy = false,
-    priority = 1000,
   },
+
+  -- moonfly colors colorscheme
+  { 'bluz71/vim-moonfly-colors', name = 'moonfly', lazy = false },
+
+  -- melange colorscheme
+  { 'savq/melange-nvim' },
+
+  -- vague 2k colorscheme
+  {
+    'vague2k/vague.nvim',
+    lazy = false, -- make sure we load this during startup if it is your main colorscheme
+    priority = 1000, -- make sure to load this before all the other plugins
+  },
+
+  -- oxocarbon colorscheme
+  { 'nyoom-engineering/oxocarbon.nvim' },
+
+  -- alabaster colorscheme
+  { 'p00f/alabaster.nvim' },
 
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
@@ -341,6 +369,7 @@ require('lazy').setup({
         { '<leader>s', group = '[S]earch' },
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { '<leader>r', group = '[R]ename' },
       },
     },
   },
@@ -678,7 +707,7 @@ require('lazy').setup({
           },
           filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cuda', 'proto' },
         },
-        -- gopls = {},
+        gopls = {},
         pyright = {
           settings = {
             python = {
@@ -934,7 +963,7 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'bamboo'
+      vim.cmd.colorscheme 'vague'
     end,
   },
 
